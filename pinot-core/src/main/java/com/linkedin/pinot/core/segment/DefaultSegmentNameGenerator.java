@@ -84,6 +84,10 @@ public class DefaultSegmentNameGenerator implements SegmentNameGenerator {
 
     String segmentName;
 
+    if (_tableName == null) {
+      throw new RuntimeException("Table name is not defined");
+    }
+
     if (_timeColumnName != null && _timeColumnName.length() > 0) {
       final Object minTimeValue = statsCollector.getMinValue();
       final Object maxTimeValue = statsCollector.getMaxValue();
