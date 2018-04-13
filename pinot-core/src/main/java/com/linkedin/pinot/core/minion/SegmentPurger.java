@@ -61,6 +61,10 @@ public class SegmentPurger {
     _recordModifier = recordModifier;
   }
 
+  public boolean shouldPurge() {
+    return true;
+  }
+
   public File purgeSegment() throws Exception {
     SegmentMetadata segmentMetadata = new SegmentMetadataImpl(_originalIndexDir);
     String tableName = segmentMetadata.getTableName();

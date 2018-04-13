@@ -43,7 +43,12 @@ public class PurgeTaskExecutor extends BaseSegmentConversionExecutor {
       recordModifier = recordModifierFactory.getRecordModifier(rawTableName);
     }
 
-    return new SegmentPurger(originalIndexDir, workingDir, recordPurger, recordModifier).purgeSegment();
+    SegmentPurger segmentPurger = new SegmentPurger(originalIndexDir, workingDir, recordPurger, recordModifier);
+    if (segmentPurger.shouldPurge()) {
+      return segmentPurger.purgeSegment();
+    } else {
+      return originalIndexDir;
+    }
   }
 
   @Override
