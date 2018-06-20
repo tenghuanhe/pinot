@@ -29,6 +29,7 @@ import com.linkedin.pinot.filesystem.PinotFS;
 import com.linkedin.pinot.filesystem.PinotFSFactory;
 import java.io.File;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -53,7 +54,8 @@ public class PinotSegmentUploadUtils {
 
   public URI constructFinalLocation(SegmentMetadata segmentMetadata, UUID version) throws Exception {
     FileUploadPathProvider provider = new FileUploadPathProvider(_controllerConf);
-    return new File(new File(new File(provider.getBaseDataDir(), segmentMetadata.getTableName()), segmentMetadata.getName()), version.toString()).toURI();
+    File destFile = new File(new File(new File(provider.getBaseDataDir(), segmentMetadata.getTableName()), segmentMetadata.getName()), version.toString());
+    return destFile.toURI();
   }
   /**
    * Updates zk metadata for uploaded segments
