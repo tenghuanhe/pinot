@@ -15,6 +15,7 @@
  */
 package com.linkedin.pinot.filesystem;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import org.apache.commons.configuration.Configuration;
@@ -52,13 +53,15 @@ public abstract class PinotFS {
   /**
    * Copies a file from src to dst. Keeps the original file. If the dst has parent directories that haven't
    * been created, this method will create all the necessary parent directories. If dst already exists, it will overwrite.
-   * Works both for moving a directory and a file.
+   * Works both for moving a directory and a file. Will handle copying to local if copying directly between clusters
+   * does not succeed.
    * @param srcUri URI of the original file
    * @param dstUri URI of the final file location
+   * @param tempSegmentFile location of temporary file if segment cannot be directly copied to dstUri
    * @return true if copy is successful
    * @throws IOException on IO Failure
    */
-  public abstract boolean copy(URI srcUri, URI dstUri) throws IOException;
+  public abstract boolean copy(URI srcUri, URI dstUri, File tempSegmentFile) throws IOException;
 
   /**
    * Checks whether the file or directory at the provided location exists.
@@ -90,9 +93,9 @@ public abstract class PinotFS {
    * Copies a file from a remote filesystem to the local one. Keeps the original file.
    * @param srcUri location of current file on remote filesystem
    * @param dstUri location of destination on local filesystem
-   * @throws IOException IO Failures
+   * @throws Exception for IO failures and retry failures
    */
-  public abstract void copyToLocalFile(URI srcUri, URI dstUri) throws IOException;
+  public abstract void copyToLocalFile(URI srcUri, URI dstUri) throws Exception;
 
   /**
    * The src file is on the local disk. Add it to filesystem at the given dst name and the source is kept intact
@@ -102,4 +105,11 @@ public abstract class PinotFS {
    * @throws IOException for IO Error
    */
   public abstract void copyFromLocalFile(URI srcUri, URI dstUri) throws IOException;
+
+  /**
+   * This method will determine whether files can be moved from the srcUri to the dstUri without
+   * copying the file locally first. We will handle move and copy inside the fs even if
+   * a copyToLocal needs to be done.
+   */
+  public abstract boolean canMoveBetweenLocations(URI srcUri, URI dstUri);
 }

@@ -72,7 +72,7 @@ public class LocalPinotFSTest {
     // Check that file does not exist
     Assert.assertTrue(!localPinotFS.exists(secondTestFileUri));
 
-    localPinotFS.copy(testFileUri, secondTestFileUri);
+    localPinotFS.copy(testFileUri, secondTestFileUri, );
     Assert.assertEquals(2, localPinotFS.listFiles(_absoluteTmpDirPath.toURI()).length);
 
     // Check file copy worked when file was not created
@@ -83,7 +83,7 @@ public class LocalPinotFSTest {
     Assert.assertTrue(thirdTestFile.createNewFile(), "Could not create file " + thirdTestFile.getPath());
 
     // Check file copy to location where something already exists still works
-    localPinotFS.copy(testFileUri, thirdTestFile.toURI());
+    localPinotFS.copy(testFileUri, thirdTestFile.toURI(), );
     // Check length of file
     Assert.assertEquals(0, localPinotFS.length(secondTestFileUri));
     Assert.assertTrue(localPinotFS.exists(thirdTestFile.toURI()));
@@ -102,7 +102,7 @@ public class LocalPinotFSTest {
     Assert.assertTrue(firstTempDir.mkdirs(), "Could not make directory " + firstTempDir.getPath());
 
     // Check that directory only copy worked
-    localPinotFS.copy(firstTempDir.toURI(), secondTempDir.toURI());
+    localPinotFS.copy(firstTempDir.toURI(), secondTempDir.toURI(), );
     Assert.assertTrue(localPinotFS.exists(secondTempDir.toURI()));
 
     // Copying directory with files to directory with files
@@ -111,7 +111,7 @@ public class LocalPinotFSTest {
     File newTestFile = new File(secondTempDir, "newTestFile");
     Assert.assertTrue(newTestFile.createNewFile(), "Could not create file " + newTestFile.getPath());
 
-    localPinotFS.copy(firstTempDir.toURI(), secondTempDir.toURI());
+    localPinotFS.copy(firstTempDir.toURI(), secondTempDir.toURI(), );
     localPinotFS.listFiles(secondTempDir.toURI());
     Assert.assertEquals(localPinotFS.listFiles(secondTempDir.toURI()).length, 1);
 
