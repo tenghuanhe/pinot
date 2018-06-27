@@ -213,6 +213,7 @@ public class TableQueryQuotaManagerTest {
     ZKMetadataProvider.setRealtimeTableConfig(_testPropertyStore, REALTIME_TABLE_NAME, TableConfig.toZnRecord(realtimeTableConfig));
     ZKMetadataProvider.setOfflineTableConfig(_testPropertyStore, OFFLINE_TABLE_NAME, TableConfig.toZnRecord(offlineTableConfig));
 
+    // Since each table has 2 online brokers, per broker rate becomes 100.0 / 2 = 50.0
     _tableQueryQuotaManager.initTableQueryQuota(offlineTableConfig, brokerResource);
     Assert.assertEquals(_tableQueryQuotaManager.getRateLimiterMapSize(), 1);
     _tableQueryQuotaManager.initTableQueryQuota(realtimeTableConfig, brokerResource);
@@ -221,8 +222,8 @@ public class TableQueryQuotaManagerTest {
 
     for (int i = 0; i < 70; i++) {
       Assert.assertTrue(_tableQueryQuotaManager.acquire(RAW_TABLE_NAME));
-      // Rate limiter generates 1 token every 10 milliseconds, have to make it sleep for a while.
-      Thread.sleep(10);
+      // Rate limiter generates 1 token every 20 milliseconds, have to make it sleep for a while.
+      Thread.sleep(20);
     }
 
     _tableQueryQuotaManager.dropTableQueryQuota(OFFLINE_TABLE_NAME);
