@@ -81,6 +81,10 @@ public abstract class ClusterTest extends ControllerTest {
   private List<HelixServerStarter> _serverStarters = new ArrayList<>();
   private List<MinionStarter> _minionStarters = new ArrayList<>();
 
+  protected Schema _schema;
+  protected TableConfig _offlineTableConfig;
+  protected TableConfig _realtimeTableConfig;
+
   protected void startBroker() {
     startBrokers(1);
   }
@@ -216,9 +220,14 @@ public abstract class ClusterTest extends ControllerTest {
   }
 
   protected void addSchema(File schemaFile, String schemaName) throws Exception {
-    try (FileUploadDownloadClient fileUploadDownloadClient = new FileUploadDownloadClient()) {
-      fileUploadDownloadClient.addSchema(FileUploadDownloadClient.getUploadSchemaHttpURI(LOCAL_HOST, _controllerPort),
-          schemaName, schemaFile);
+    if (!isUsingNewConfigFormat()) {
+      try (FileUploadDownloadClient fileUploadDownloadClient = new FileUploadDownloadClient()) {
+        fileUploadDownloadClient
+            .addSchema(FileUploadDownloadClient.getUploadSchemaHttpURI(LOCAL_HOST, _controllerPort), schemaName,
+                schemaFile);
+      }
+    } else {
+      _schema = Schema.fromFile(schemaFile);
     }
   }
 
@@ -268,7 +277,12 @@ public abstract class ClusterTest extends ControllerTest {
     TableConfig tableConfig =
         getOfflineTableConfig(tableName, timeColumnName, timeType, brokerTenant, serverTenant, loadMode, segmentVersion,
             invertedIndexColumns, taskConfig);
-    sendPostRequest(_controllerRequestURLBuilder.forTableCreate(), tableConfig.toJSONConfigString());
+
+    if (!isUsingNewConfigFormat()) {
+      sendPostRequest(_controllerRequestURLBuilder.forTableCreate(), tableConfig.toJSONConfigString());
+    } else {
+      _offlineTableConfig = tableConfig;
+    }
   }
 
   protected void updateOfflineTable(String tableName, String timeColumnName, String timeType, String brokerTenant,
@@ -277,7 +291,12 @@ public abstract class ClusterTest extends ControllerTest {
     TableConfig tableConfig =
         getOfflineTableConfig(tableName, timeColumnName, timeType, brokerTenant, serverTenant, loadMode, segmentVersion,
             invertedIndexColumns, taskConfig);
-    sendPutRequest(_controllerRequestURLBuilder.forUpdateTableConfig(tableName), tableConfig.toJSONConfigString());
+
+    if (!isUsingNewConfigFormat()) {
+      sendPutRequest(_controllerRequestURLBuilder.forUpdateTableConfig(tableName), tableConfig.toJSONConfigString());
+    } else {
+      _offlineTableConfig = tableConfig;
+    }
   }
 
   private static TableConfig getOfflineTableConfig(String tableName, String timeColumnName, String timeType,
@@ -299,6 +318,10 @@ public abstract class ClusterTest extends ControllerTest {
   protected void dropOfflineTable(String tableName) throws Exception {
     sendDeleteRequest(
         _controllerRequestURLBuilder.forTableDelete(TableNameBuilder.OFFLINE.tableNameWithType(tableName)));
+  }
+
+  protected boolean isUsingNewConfigFormat() {
+    return false;
   }
 
   public static class AvroFileSchemaKafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
@@ -377,7 +400,12 @@ public abstract class ClusterTest extends ControllerTest {
         .setStreamConfigs(streamConfigs)
         .setTaskConfig(taskConfig)
         .build();
-    sendPostRequest(_controllerRequestURLBuilder.forTableCreate(), tableConfig.toJSONConfigString());
+
+    if (!isUsingNewConfigFormat()) {
+      sendPostRequest(_controllerRequestURLBuilder.forTableCreate(), tableConfig.toJSONConfigString());
+    } else {
+      _realtimeTableConfig = tableConfig;
+    }
   }
 
   protected void dropRealtimeTable(String tableName) throws Exception {

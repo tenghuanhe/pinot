@@ -1000,7 +1000,7 @@ public class PinotHelixResourceManager {
    * @throws InvalidTableConfigException
    * @throws TableAlreadyExistsException for offline tables only if the table already exists
    */
-  public void addTable(@Nonnull TableConfig tableConfig) throws IOException {
+  public void addTable(@Nonnull TableConfig tableConfig) {
     final String tableNameWithType = tableConfig.getTableName();
 
     TenantConfig tenantConfig;
