@@ -82,6 +82,9 @@
       <groupId>com.linkedin.pinot</groupId>
       <artifactId>pinot-common</artifactId>
       <version>${project.version}</version>
+      <scope>system</scope>
+      <type>jar</type>
+      <systemPath>${project.build.directory}/../../pinot-common/target/pinot-common-0.016-shaded.jar</systemPath>
       <classifier>shaded</classifier>
     </dependency>
     <dependency>
