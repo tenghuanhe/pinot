@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.pinot.core.realtime;
+package com.linkedin.pinot.core.realtime.streamV2;
 
-public class SegmentMetadataChangeContext {
+import java.io.Closeable;
 
-  String pathChanged;
-  /**
-   * can be CREATED, DELETED, DATA_CHANGED. We can do enum here, but this is for information only.
-   * Avoid using this in logic, its hard to code against delta changes. Better to have implementation that is idempotent
-   */
-  String changeType;
+public interface StreamConsumer extends Closeable {
 }
