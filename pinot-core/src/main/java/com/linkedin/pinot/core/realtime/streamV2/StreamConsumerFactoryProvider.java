@@ -14,7 +14,7 @@ public class StreamConsumerFactoryProvider {
     String streamConsumerFactoryProperty =
         StreamConfigProperties.constructStreamProperty(streamType, StreamConfigProperties.CONSUMER_FACTORY_CLASS);
 
-    String factoryClassString = streamConfig.getValue(streamConsumerFactoryProperty);
+    String factoryClassString = streamConfig.getStreamSpecificValue(StreamConfigProperties.CONSUMER_FACTORY_CLASS);
     StreamConsumerFactory factory = null;
     try {
       Class<?> streamConsumerFactoryClass = Class.forName(factoryClassString);

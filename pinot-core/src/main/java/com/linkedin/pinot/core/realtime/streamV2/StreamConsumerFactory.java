@@ -2,15 +2,15 @@ package com.linkedin.pinot.core.realtime.streamV2;
 
 public abstract class StreamConsumerFactory {
 
-  private StreamConfig _streamConfig;
+  protected StreamConfig _streamConfig;
 
   public StreamConsumerFactory(StreamConfig streamConfig) {
     _streamConfig = streamConfig;
   }
 
-  abstract SimpleStreamConsumer createSimpleConsumer();
+  public abstract SimpleStreamConsumer createSimpleConsumer(String clientId, int partition);
 
-  abstract HighLevelStreamConsumer createHighLevelConsumer();
+  public abstract HighLevelStreamConsumer createHighLevelConsumer();
 
-  abstract StreamMetadataProvider createStreamMetadataProvider();
+  public abstract StreamMetadataProvider createStreamMetadataProvider();
 }

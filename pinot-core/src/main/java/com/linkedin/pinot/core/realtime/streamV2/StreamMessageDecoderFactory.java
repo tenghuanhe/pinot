@@ -22,9 +22,7 @@ public class StreamMessageDecoderFactory {
       }
     }
 
-    String decoderClassProperty =
-        StreamConfigProperties.constructStreamProperty(streamType, StreamConfigProperties.DECODER_CLASS);
-    String decoderClassString = streamConfig.getValue(decoderClassProperty);
+    String decoderClassString = streamConfig.getStreamSpecificValue(StreamConfigProperties.DECODER_CLASS);
     StreamMessageDecoder decoder;
     try {
       decoder = (StreamMessageDecoder) Class.forName(decoderClassString).newInstance();

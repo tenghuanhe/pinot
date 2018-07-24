@@ -17,6 +17,8 @@ public class StreamConfigProperties {
   public static final String DECODER_CLASS = "decoder.class";
   public static final String DECODER_PROPS_PREFIX = "decoder";
   public static final String CONSUMER_FACTORY_CLASS = "consumer.factory.class";
+  public static final String CONNECTION_TIMEOUT_MILLIS = "connection.timeout.millis";
+  public static final String FETCH_TIMEOUT_MILLIS = "fetch.timeout.millis";
 
   /**
    * Generic properties
