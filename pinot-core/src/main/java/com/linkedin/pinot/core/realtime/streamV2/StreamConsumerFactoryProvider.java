@@ -9,11 +9,6 @@ import java.lang.reflect.Constructor;
  */
 public class StreamConsumerFactoryProvider {
   public static StreamConsumerFactory create(StreamConfig streamConfig) {
-    String streamType = streamConfig.getType();
-
-    String streamConsumerFactoryProperty =
-        StreamConfigProperties.constructStreamProperty(streamType, StreamConfigProperties.CONSUMER_FACTORY_CLASS);
-
     String factoryClassString = streamConfig.getStreamSpecificValue(StreamConfigProperties.CONSUMER_FACTORY_CLASS);
     StreamConsumerFactory factory = null;
     try {

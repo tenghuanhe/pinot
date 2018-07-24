@@ -5,8 +5,6 @@ import java.io.Closeable;
 
 public interface StreamMetadataProvider extends Closeable {
 
-  int getPartitionCount(StreamConfig streamConfig);
-
-  long getPartitionOffset(StreamConfig streamConfig, int partitionId, String offsetCriteria);
+  int getPartitionCount(int timeoutMillis);
 
 }

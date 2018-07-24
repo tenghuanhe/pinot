@@ -24,7 +24,7 @@ public class KafkaStreamConsumerFactory extends StreamConsumerFactory {
   }
 
   @Override
-  public StreamMetadataProvider createStreamMetadataProvider() {
-    return new KafkaStreamMetadataProvider();
+  public StreamMetadataProvider createStreamMetadataProvider(String clientId) {
+    return new KafkaSimpleStreamMetadataProvider(_streamConfig, clientId);
   }
 }

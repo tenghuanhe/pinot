@@ -12,5 +12,5 @@ public abstract class StreamConsumerFactory {
 
   public abstract HighLevelStreamConsumer createHighLevelConsumer();
 
-  public abstract StreamMetadataProvider createStreamMetadataProvider();
+  public abstract StreamMetadataProvider createStreamMetadataProvider(String clientId);
 }
