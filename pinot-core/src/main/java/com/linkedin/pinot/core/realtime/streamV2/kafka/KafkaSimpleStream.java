@@ -29,7 +29,8 @@ public class KafkaSimpleStream {
 
   private static final int SOCKET_TIMEOUT_MILLIS = 10000;
   private static final int SOCKET_BUFFER_SIZE = 512000;
-  private static final String BROKER_LIST = "broker.list";
+
+  private KafkaStreamConfig _kafkaStreamConfig;
 
   enum ConsumerState {
     CONNECTING_TO_BOOTSTRAP_NODE,
@@ -56,12 +57,15 @@ public class KafkaSimpleStream {
   private boolean _metadataOnlyConsumer = false;
 
   KafkaSimpleStream(StreamConfig streamConfig, String clientId, int partition) {
+    _kafkaStreamConfig = new KafkaStreamConfig(streamConfig);
+
     _clientId = clientId;
     _partition = partition;
     _topic = streamConfig.getName();
     _connectionTimeoutMillis = streamConfig.getConnectionTimeoutMillis();
     _simpleConsumer = null;
-    String bootstrapNodes = streamConfig.getStreamSpecificValue(BROKER_LIST);
+
+    String bootstrapNodes = _kafkaStreamConfig.getBootstrapHosts();
     initializeBootstrapNodeList(bootstrapNodes);
     setCurrentState(new ConnectingToBootstrapNode());
   }

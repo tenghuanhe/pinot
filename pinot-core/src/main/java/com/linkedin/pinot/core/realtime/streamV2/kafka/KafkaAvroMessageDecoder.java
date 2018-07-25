@@ -44,8 +44,7 @@ import org.slf4j.LoggerFactory;
 
 @NotThreadSafe
 public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      KafkaAvroMessageDecoder.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAvroMessageDecoder.class);
 
   private static final String SCHEMA_REGISTRY_REST_URL = "schema.registry.rest.url";
   private static final String SCHEMA_REGISTRY_SCHEMA_NAME = "schema.registry.schema.name";
@@ -55,7 +54,7 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
   // A global cache for schemas across all threads.
   private static final Map<String, org.apache.avro.Schema> globalSchemaCache = new HashMap<>();
   // Suffix for getting the latest schema
-  private static final String LATEST="-latest";
+  private static final String LATEST = "-latest";
 
   // Reusable byte[] to read MD5 from payload. This is OK as this class is used only by a single thread.
   private final byte[] reusableMD5Bytes = new byte[SCHEMA_HASH_LENGTH];
@@ -81,8 +80,8 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
     _schemaRegistryUrls = parseSchemaRegistryUrls(props.get(SCHEMA_REGISTRY_REST_URL));
 
     String avroSchemaName = topicName;
-    if(props.containsKey(SCHEMA_REGISTRY_SCHEMA_NAME) && props.get(SCHEMA_REGISTRY_SCHEMA_NAME) != null &&
-        !props.get(SCHEMA_REGISTRY_SCHEMA_NAME).isEmpty()) {
+    if (props.containsKey(SCHEMA_REGISTRY_SCHEMA_NAME) && props.get(SCHEMA_REGISTRY_SCHEMA_NAME) != null && !props.get(
+        SCHEMA_REGISTRY_SCHEMA_NAME).isEmpty()) {
       avroSchemaName = props.get(SCHEMA_REGISTRY_SCHEMA_NAME);
     }
     // With the logic below, we may not set defaultAvroSchema to be the latest one everytime.
@@ -137,7 +136,8 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
             md5ToAvroSchemaMap.addSchema(reusableMD5Bytes, schema);
           } catch (Exception e) {
             schema = defaultAvroSchema;
-            LOGGER.error("Error fetching schema using url {}. Attempting to continue with previous schema", schemaUri, e);
+            LOGGER.error("Error fetching schema using url {}. Attempting to continue with previous schema", schemaUri,
+                e);
             schemaUpdateFailed = true;
           }
         } else {
@@ -152,8 +152,9 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
           _decoderFactory.createBinaryDecoder(payload, HEADER_LENGTH + offset, length - HEADER_LENGTH, null));
       return _avroRecordConverter.transform(avroRecord, destination);
     } catch (IOException e) {
-      LOGGER.error("Caught exception while reading message using schema {}{}", (schema==null ? "null" : schema.getName()),
-          (schemaUpdateFailed? "(possibly due to schema update failure)" : ""), e);
+      LOGGER.error("Caught exception while reading message using schema {}{}",
+          (schema == null ? "null" : schema.getName()),
+          (schemaUpdateFailed ? "(possibly due to schema update failure)" : ""), e);
       return null;
     }
   }
@@ -169,7 +170,6 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
     }
     return builder.toString();
   }
-
 
   private static class SchemaFetcher implements Callable<Boolean> {
     private org.apache.avro.Schema _schema;
@@ -263,13 +263,12 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
     }
   }
 
-
   @Override
   public void close() throws IOException {
 
   }
 
-  protected URL makeRandomUrl(String reference) throws MalformedURLException{
+  protected URL makeRandomUrl(String reference) throws MalformedURLException {
     Random rand = new Random();
     int randomInteger = rand.nextInt(_schemaRegistryUrls.length);
     return new URL(_schemaRegistryUrls[randomInteger] + reference);
@@ -278,5 +277,4 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
   protected String[] parseSchemaRegistryUrls(String schemaConfig) {
     return schemaConfig.split(",");
   }
-
 }
