@@ -130,7 +130,7 @@ public class TableQueryQuotaManager {
     }
 
     if (brokerResource == null) {
-      LOGGER.warn("Failed to init qps quota for table {}. No broker resource connected!", tableName);
+      LOGGER.warn("Failed to create qps quota for table {}. No broker resource connected!", tableName);
       return;
     }
 
@@ -157,7 +157,7 @@ public class TableQueryQuotaManager {
     if (quotaConfig.isMaxQueriesPerSecondValid()) {
       overallRate = Double.parseDouble(quotaConfig.getMaxQueriesPerSecond());
     } else {
-      LOGGER.error("Failed to init qps quota: error when parsing qps quota: {} for table: {}",
+      LOGGER.error("Failed to create qps quota: error when parsing qps quota: {} for table: {}",
           quotaConfig.getMaxQueriesPerSecond(), tableName);
       return;
     }

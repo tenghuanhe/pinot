@@ -51,7 +51,7 @@ public class ZookeeperLauncher {
     IDefaultNameSpace defaultNameSpace = new IDefaultNameSpace() {
       @Override
       public void createDefaultNameSpace(org.I0Itec.zkclient.ZkClient zkClient) {
-        // init any zk paths if needed
+        // create any zk paths if needed
       }
     };
     LOGGER.info("Starting zookeeper at localhost:{} in thread: {}", zkPort, Thread.currentThread().getName());

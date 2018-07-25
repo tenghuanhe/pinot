@@ -108,7 +108,7 @@ public class StartZookeeperCommand extends AbstractBaseAdminCommand implements C
     IDefaultNameSpace _defaultNameSpace = new IDefaultNameSpace() {
       @Override
       public void createDefaultNameSpace(org.I0Itec.zkclient.ZkClient zkClient) {
-        // init any zk paths if needed
+        // create any zk paths if needed
       }
     };
 

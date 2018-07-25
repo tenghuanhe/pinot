@@ -51,7 +51,7 @@ public class LiveInstancesChangeListenerImpl implements LiveInstanceChangeListen
   @Override
   public void onLiveInstanceChange(List<LiveInstance> liveInstances, NotificationContext changeContext) {
     if (connectionPool == null) {
-      LOGGER.warn("init has not been called on the live instances listener, ignoring live instance change.");
+      LOGGER.warn("create has not been called on the live instances listener, ignoring live instance change.");
       return;
     }
 

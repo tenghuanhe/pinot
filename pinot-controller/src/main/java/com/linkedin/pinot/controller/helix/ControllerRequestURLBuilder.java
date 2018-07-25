@@ -54,6 +54,10 @@ public class ControllerRequestURLBuilder {
     return StringUtil.join("/", StringUtils.chomp(_baseUrl, "/"), "segments");
   }
 
+  public String forMetadataFileUpload() {
+    return StringUtil.join("/", StringUtils.chomp(_baseUrl, "/"), "segmentmetadata");
+  }
+
   public String forInstanceCreate() {
     return StringUtil.join("/", StringUtils.chomp(_baseUrl, "/"), "instances/");
   }

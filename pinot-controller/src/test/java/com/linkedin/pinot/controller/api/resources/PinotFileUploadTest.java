@@ -50,6 +50,18 @@ public class PinotFileUploadTest extends ControllerTest {
     Assert.assertTrue(statusCode >= 400 && statusCode < 500, "Status code = " + statusCode);
   }
 
+  @Test
+  public void testUploadBogusMetaData() throws Exception {
+    org.apache.http.client.HttpClient httpClient = new DefaultHttpClient();
+    HttpPost httpPost = new HttpPost(_controllerRequestURLBuilder.forMetadataFileUpload());
+    HttpEntity entity = new StringEntity("blah");
+    httpPost.setEntity(entity);
+    HttpResponse response = httpClient.execute(httpPost);
+    int statusCode = response.getStatusLine().getStatusCode();
+
+    Assert.assertTrue(statusCode >= 400 && statusCode < 500, "Status code = " + statusCode);
+  }
+
   @BeforeClass
   public void setUp() throws Exception {
     startZk();
