@@ -1,7 +1,10 @@
 package com.linkedin.pinot.core.realtime.streamV2;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.linkedin.pinot.common.utils.DataSize;
 import com.linkedin.pinot.common.utils.time.TimeUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,39 +23,46 @@ public class StreamConfig {
 
   private int DEFAULT_FLUSH_THRESHOLD_ROWS = 5_000_000;
   private long DEFAULT_FLUSH_THRESHOLD_TIME = TimeUnit.MILLISECONDS.convert(6, TimeUnit.HOURS);
+  private static final long DEFAULT_DESIRED_SEGMENT_SIZE_BYTES = 200 * 1024 * 1024;
 
   private static final long DEFAULT_STREAM_CONNECTION_TIMEOUT_MILLIS = 30_000;
   private static final int DEFAULT_STREAM_FETCH_TIMEOUT_MILLIS = 5_000;
 
   private String _type;
-  private String _name;
-  private List<StreamConsumerType> _consumerTypes;
+  private String _topicName;
+  private List<StreamConsumerType> _consumerTypes = new ArrayList<>();
   private long _connectionTimeoutMillis = DEFAULT_STREAM_CONNECTION_TIMEOUT_MILLIS;
   private long _fetchTimeoutMillis = DEFAULT_STREAM_FETCH_TIMEOUT_MILLIS;
   private int _flushThresholdRows = DEFAULT_FLUSH_THRESHOLD_ROWS;
   private long _flushThresholdTimeMillis = DEFAULT_FLUSH_THRESHOLD_TIME;
+  private long _flushSegmentDesiredSizeBytes = DEFAULT_DESIRED_SEGMENT_SIZE_BYTES;
 
-  private Map<String, String> _streamConfigMap;
+  private String _decoderClass;
+  private String _consumerFactoryClass;
+  private Map<String, String> _decoderProperties = new HashMap<>();
+
+  Map<String, String> _streamSpecificProperties = new HashMap<>();
 
   public StreamConfig(@Nonnull Map<String, String> streamConfigMap) {
 
-    _streamConfigMap = streamConfigMap;
     _type = streamConfigMap.get(StreamConfigProperties.STREAM_TYPE);
+    _topicName = streamConfigMap.get(StreamConfigProperties.STREAM_TOPIC_NAME);
 
-    String streamNameProperty = StreamConfigProperties.constructStreamProperty(_type, StreamConfigProperties.NAME);
-    _name = streamConfigMap.get(streamNameProperty);
+    Preconditions.checkNotNull(_type, "Stream type cannot be null");
+    Preconditions.checkNotNull(_topicName, "Stream topic name cannot be null");
 
-    String consumerTypes = StreamConfigProperties.constructStreamProperty(_type, StreamConfigProperties.CONSUMER_TYPES);
+    String consumerTypes = streamConfigMap.get(StreamConfigProperties.STREAM_CONSUMER_TYPES);
+    Preconditions.checkNotNull(consumerTypes, "Must specify at least one consumer type");
     for (String consumerType : consumerTypes.split(",")) {
       _consumerTypes.add(StreamConsumerType.valueOf(consumerType));
     }
 
-    String connectionTimeout = getStreamSpecificValue(StreamConfigProperties.CONNECTION_TIMEOUT_MILLIS);
+    String connectionTimeout = streamConfigMap.get(StreamConfigProperties.STREAM_CONNECTION_TIMEOUT_MILLIS);
     if (connectionTimeout != null) {
       _connectionTimeoutMillis = Long.parseLong(connectionTimeout);
     }
 
-    String fetchTimeout = getStreamSpecificValue(StreamConfigProperties.FETCH_TIMEOUT_MILLIS);
+    String fetchTimeout = streamConfigMap.get(StreamConfigProperties.STREAM_FETCH_TIMEOUT_MILLIS);
     if (fetchTimeout != null) {
       _fetchTimeoutMillis = Long.parseLong(fetchTimeout);
     }
@@ -66,19 +76,38 @@ public class StreamConfig {
     if (flushThresholdTime != null) {
       _flushThresholdTimeMillis = TimeUtils.convertPeriodToMillis(flushThresholdTime);
     }
-    // TODO
-    // Add desired segment size
-    // Look for stream.<name>.decoder.class and set it as a generic property
-    // Look for stream.<name>.consumer.factory.class and set it as a generic property
+    String flushSegmentDesiredSize = streamConfigMap.get(StreamConfigProperties.STREAM_FLUSH_SEGMENT_DESIRED_SIZE);
+    if (flushSegmentDesiredSize != null) {
+      _flushSegmentDesiredSizeBytes = DataSize.toBytes(flushSegmentDesiredSize);
+    }
+
+    _decoderClass = streamConfigMap.get(StreamConfigProperties.STREAM_DECODER_CLASS);
+    Preconditions.checkNotNull(_decoderClass, "Must specify decoder class");
+
+    for (String key : streamConfigMap.keySet()) {
+      if (key.startsWith(StreamConfigProperties.STREAM_DECODER_PROPERTIES_PREFIX)) {
+        _decoderProperties.put(key, streamConfigMap.get(key));
+      }
+    }
+
+    _consumerFactoryClass = streamConfigMap.get(StreamConfigProperties.STREAM_CONSUMER_FACTORY_CLASS);
+    Preconditions.checkNotNull(_consumerFactoryClass, "Must specify consumer factory class name");
+
+    String streamSpecificPrefix =
+        Joiner.on(StreamConfigProperties.DOT_SEPARATOR).join(StreamConfigProperties.STREAM_PREFIX, _type);
+    for (String key : streamConfigMap.keySet()) {
+      if (key.startsWith(streamSpecificPrefix)) {
+        _streamSpecificProperties.put(key, streamConfigMap.get(key));
+      }
+    }
   }
 
   public String getType() {
     return _type;
   }
 
-  // Rename to getTopicName?
-  public String getName() {
-    return _name;
+  public String getTopicName() {
+    return _topicName;
   }
 
   public boolean hasHighLevelConsumer() {
@@ -105,41 +134,23 @@ public class StreamConfig {
     return _flushThresholdTimeMillis;
   }
 
-  public String getValue(String key) {
-    return _streamConfigMap.get(key);
+  public long getFlushSegmentDesiredSizeBytes() {
+    return _flushSegmentDesiredSizeBytes;
   }
 
-  // TODO Remove this method
-  public String getStreamSpecificValue(String key) {
-    String streamProperty = StreamConfigProperties.constructStreamProperty(_type, key);
-    return _streamConfigMap.get(streamProperty);
-  }
-
-  public Map<String, String> getStreamSpecificProperties() {
-    Map<String, String> streamSpecificProperties = new HashMap<>();
-    String streamSpecificPrefix =
-        Joiner.on(StreamConfigProperties.DOT_SEPARATOR).join(StreamConfigProperties.STREAM_PREFIX, _type);
-    for (String key : _streamConfigMap.keySet()) {
-      if (key.startsWith(streamSpecificPrefix)) {
-        streamSpecificProperties.put(key, _streamConfigMap.get(key));
-      }
-    }
-    return streamSpecificProperties;
+  public String getDecoderClass() {
+    return _decoderClass;
   }
 
   public Map<String, String> getDecoderProperties() {
-    String decoderPropsPrefix =
-        StreamConfigProperties.constructStreamProperty(_type, StreamConfigProperties.DECODER_PROPS_PREFIX);
-    Map<String, String> decoderProps = new HashMap<>();
-    for (String key : _streamConfigMap.keySet()) {
-      if (key.startsWith(decoderPropsPrefix)) {
-        decoderProps.put(getDecoderPropertyKey(key), _streamConfigMap.get(key));
-      }
-    }
-    return decoderProps;
+    return _decoderProperties;
   }
 
-  private String getDecoderPropertyKey(String key) {
-    return key.split(StreamConfigProperties.DECODER_PROPS_PREFIX + StreamConfigProperties.DOT_SEPARATOR)[1];
+  public String getConsumerFactoryClass() {
+    return _consumerFactoryClass;
+  }
+
+  public Map<String, String> getStreamSpecificProperties() {
+    return _streamSpecificProperties;
   }
 }

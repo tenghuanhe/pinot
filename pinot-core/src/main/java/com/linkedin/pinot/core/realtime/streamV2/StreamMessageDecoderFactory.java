@@ -7,8 +7,7 @@ public class StreamMessageDecoderFactory {
 
   public static StreamMessageDecoder createStreamMessageDecoder(StreamConfig streamConfig) {
 
-    // TODO Make it generic method
-    String decoderClassString = streamConfig.getStreamSpecificValue(StreamConfigProperties.DECODER_CLASS);
+    String decoderClassString = streamConfig.getDecoderClass();
     StreamMessageDecoder decoder;
     try {
       decoder = (StreamMessageDecoder) Class.forName(decoderClassString).newInstance();

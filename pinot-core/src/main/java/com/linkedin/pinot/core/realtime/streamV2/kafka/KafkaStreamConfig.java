@@ -1,5 +1,6 @@
 package com.linkedin.pinot.core.realtime.streamV2.kafka;
 
+import com.google.common.base.Preconditions;
 import com.linkedin.pinot.common.utils.CommonConstants;
 import com.linkedin.pinot.core.realtime.streamV2.StreamConfig;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import kafka.consumer.ConsumerConfig;
 
 public class KafkaStreamConfig {
   private static final Map<String, String> defaultProps;
+
   static {
     defaultProps = new HashMap<>();
     defaultProps.put("zookeeper.session.timeout.ms", "30000");
@@ -25,7 +27,6 @@ public class KafkaStreamConfig {
   }
 
   private Map<String, String> _kafkaStreamProperties;
-  private StreamConfig _streamConfig;
 
   private String _kafkaTopicName;
   private String _groupId;
@@ -34,17 +35,22 @@ public class KafkaStreamConfig {
   private Map<String, String> _kafkaConsumerProperties;
 
   public KafkaStreamConfig(StreamConfig streamConfig) {
-    _streamConfig = streamConfig;
     _kafkaStreamProperties = streamConfig.getStreamSpecificProperties();
 
-    _kafkaTopicName = streamConfig.getName();
+    _kafkaTopicName = streamConfig.getTopicName();
     if (streamConfig.hasHighLevelConsumer()) {
-      // TODO Get map and give it to Kafka and let it figure out all config it needs.
-      _zkBrokerUrl = streamConfig.getStreamSpecificValue(KafkaStreamConfigProperties.HLC_ZK_BROKER_URL);
+      String hlcZkBrokerUrlKey =
+          KafkaStreamConfigProperties.constructStreamProperty(KafkaStreamConfigProperties.HLC_ZK_BROKER_URL);
+      _zkBrokerUrl = _kafkaStreamProperties.get(hlcZkBrokerUrlKey);
+      Preconditions.checkNotNull(_zkBrokerUrl, KafkaStreamConfigProperties.HLC_ZK_BROKER_URL + " must be defined");
+
       _groupId = null;
     }
     if (streamConfig.hasSimpleConsumer()) {
-      _bootstrapHosts = streamConfig.getStreamSpecificValue(KafkaStreamConfigProperties.LLC_BROKER_LIST);
+      String llcBrokerListKey =
+          KafkaStreamConfigProperties.constructStreamProperty(KafkaStreamConfigProperties.LLC_BROKER_LIST);
+      _bootstrapHosts = _kafkaStreamProperties.get(llcBrokerListKey);
+      Preconditions.checkNotNull(_bootstrapHosts, KafkaStreamConfigProperties.LLC_BROKER_LIST + " must be defined");
     }
 
     _kafkaConsumerProperties = new HashMap<>();
@@ -67,7 +73,7 @@ public class KafkaStreamConfig {
   }
 
   public String getGroupId() {
-    return null;
+    return _groupId;
   }
 
   public String getZkBrokerUrl() {
@@ -95,5 +101,4 @@ public class KafkaStreamConfig {
 
     return new ConsumerConfig(props);
   }
-
 }

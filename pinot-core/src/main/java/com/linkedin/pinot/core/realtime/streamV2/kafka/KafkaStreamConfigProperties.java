@@ -17,4 +17,9 @@ public class KafkaStreamConfigProperties {
     return Joiner.on(StreamConfigProperties.DOT_SEPARATOR)
         .join(StreamConfigProperties.STREAM_PREFIX, STREAM_TYPE, CONSUMER_PROPS_PREFIX);
   }
+
+  public static String constructStreamProperty(String property) {
+    return Joiner.on(StreamConfigProperties.DOT_SEPARATOR)
+        .join(StreamConfigProperties.STREAM_PREFIX, STREAM_TYPE, property);
+  }
 }

@@ -14,17 +14,17 @@ public class KafkaStreamConsumerFactory extends StreamConsumerFactory {
   }
 
   @Override
-  public SimpleStreamConsumer createSimpleConsumer(String clientId, int partition) {
-    return new KafkaSimpleStreamConsumer(_streamConfig, clientId, partition);
+  public SimpleStreamConsumer createSimpleConsumer(String clientId, int partition, String tableName) {
+    return new KafkaSimpleStreamConsumer(_streamConfig, clientId, partition, tableName);
   }
 
   @Override
-  public HighLevelStreamConsumer createHighLevelConsumer() {
-    return new KafkaHighLevelStreamConsumer(_streamConfig);
+  public HighLevelStreamConsumer createHighLevelConsumer(String tableName) {
+    return new KafkaHighLevelStreamConsumer(_streamConfig, tableName);
   }
 
   @Override
-  public StreamMetadataProvider createStreamMetadataProvider(String clientId) {
-    return new KafkaSimpleStreamMetadataProvider(_streamConfig, clientId);
+  public StreamMetadataProvider createStreamMetadataProvider(String clientId, String tableName) {
+    return new KafkaSimpleStreamMetadataProvider(_streamConfig, clientId, tableName);
   }
 }

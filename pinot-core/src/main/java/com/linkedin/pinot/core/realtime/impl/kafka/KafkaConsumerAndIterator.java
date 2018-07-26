@@ -23,13 +23,13 @@ import kafka.javaapi.consumer.ConsumerConnector;
 /**
  * Immutable tuple object for a Kafka consumer and stream iterator.
  */
-public class ConsumerAndIterator {
+public class KafkaConsumerAndIterator {
   private final ConsumerConnector _consumer;
   private final ConsumerIterator<byte[], byte[]> _iterator;
   private final long _id;
   private static final AtomicLong idGenerator = new AtomicLong(0L);
 
-  ConsumerAndIterator(final ConsumerConnector consumer, final ConsumerIterator<byte[], byte[]> iterator) {
+  public KafkaConsumerAndIterator(final ConsumerConnector consumer, final ConsumerIterator<byte[], byte[]> iterator) {
     _consumer = consumer;
     _iterator = iterator;
     _id = idGenerator.getAndIncrement();
@@ -49,7 +49,7 @@ public class ConsumerAndIterator {
 
   @Override
   public String toString() {
-    return "ConsumerAndIterator{" +
+    return "KafkaConsumerAndIterator{" +
         "_consumer=" + _consumer +
         ", _iterator=" + _iterator +
         ", _id=" + _id +

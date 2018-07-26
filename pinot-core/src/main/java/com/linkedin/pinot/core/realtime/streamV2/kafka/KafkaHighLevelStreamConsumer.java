@@ -2,6 +2,7 @@ package com.linkedin.pinot.core.realtime.streamV2.kafka;
 
 import com.linkedin.pinot.common.metrics.ServerMeter;
 import com.linkedin.pinot.common.metrics.ServerMetrics;
+import com.linkedin.pinot.core.realtime.impl.kafka.KafkaConsumerAndIterator;
 import com.linkedin.pinot.core.realtime.streamV2.HighLevelStreamConsumer;
 import com.linkedin.pinot.core.realtime.streamV2.StreamConfig;
 import com.yammer.metrics.core.Meter;
@@ -16,6 +17,7 @@ public class KafkaHighLevelStreamConsumer implements HighLevelStreamConsumer {
   private Logger INSTANCE_LOGGER = STATIC_LOGGER;
   private KafkaStreamConfig _kafkaStreamConfig;
 
+  private final String _tableName;
   private ConsumerConnector _consumer;
   private ConsumerIterator<byte[], byte[]> _consumerIterator;
   private KafkaConsumerAndIterator _kafkaConsumerAndIterator;
@@ -30,15 +32,16 @@ public class KafkaHighLevelStreamConsumer implements HighLevelStreamConsumer {
   private Meter _tableAndStreamRowsConsumed = null;
   private Meter _tableRowsConsumed = null;
 
-  public KafkaHighLevelStreamConsumer(StreamConfig streamConfig) {
+  public KafkaHighLevelStreamConsumer(StreamConfig streamConfig, String tableName) {
     _streamConfig = streamConfig;
+    _tableName = tableName;
   }
 
   @Override
-  public void init(String tableName, ServerMetrics serverMetrics) throws Exception {
-    _tableAndStreamName = tableName + "-" + _streamConfig.getName();
+  public void init(ServerMetrics serverMetrics) throws Exception {
+    _tableAndStreamName = _tableName + "-" + _streamConfig.getTopicName();
     INSTANCE_LOGGER = LoggerFactory.getLogger(
-        KafkaHighLevelStreamConsumer.class.getName() + "_" + tableName + "_" + _streamConfig.getName());
+        KafkaHighLevelStreamConsumer.class.getName() + "_" + _tableName + "_" + _streamConfig.getTopicName());
     _serverMetrics = serverMetrics;
 
     // TODO: how do we get group id?

@@ -16,6 +16,7 @@
 package com.linkedin.pinot.core.realtime.streamV2.kafka;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.linkedin.pinot.core.realtime.impl.kafka.KafkaConsumerAndIterator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;

@@ -13,10 +13,10 @@ import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.protocol.Errors;
 
 
-public class KafkaSimpleStreamMetadataProvider extends KafkaSimpleStream implements StreamMetadataProvider {
+public class KafkaSimpleStreamMetadataProvider extends KafkaConnectionProvider implements StreamMetadataProvider {
 
-  public KafkaSimpleStreamMetadataProvider(StreamConfig streamConfig, String clientId) {
-    super(streamConfig, clientId);
+  public KafkaSimpleStreamMetadataProvider(StreamConfig streamConfig, String clientId, String tableName) {
+    super(streamConfig, clientId, tableName);
   }
 
   @Override

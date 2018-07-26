@@ -3,7 +3,8 @@ package com.linkedin.pinot.core.realtime.streamV2.kafka;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.linkedin.pinot.core.realtime.streamV2.MessageBatch;
+import com.linkedin.pinot.core.realtime.impl.kafka.SimpleConsumerMessageBatch;
+import com.linkedin.pinot.core.realtime.stream.MessageBatch;
 import com.linkedin.pinot.core.realtime.streamV2.SimpleStreamConsumer;
 import com.linkedin.pinot.core.realtime.streamV2.StreamConfig;
 import java.io.IOException;
@@ -23,14 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class KafkaSimpleStreamConsumer extends KafkaSimpleStream implements SimpleStreamConsumer {
+public class KafkaSimpleStreamConsumer extends KafkaConnectionProvider implements SimpleStreamConsumer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSimpleStreamConsumer.class);
 
   private final int MAX_KAFKA_ERROR_COUNT = 10;
 
-  public KafkaSimpleStreamConsumer(StreamConfig streamConfig, String clientId, int partition) {
-    super(streamConfig, clientId, partition);
+  public KafkaSimpleStreamConsumer(StreamConfig streamConfig, String clientId, int partition, String tableName) {
+    super(streamConfig, clientId, partition, tableName);
   }
 
   /**
@@ -67,7 +68,7 @@ public class KafkaSimpleStreamConsumer extends KafkaSimpleStream implements Simp
       final Iterable<MessageAndOffset> messageAndOffsetIterable =
           buildOffsetFilteringIterable(fetchResponse.messageSet(_topic, _partition), startOffset, endOffset);
 
-      return new KafkaSimpleConsumerMessageBatch(messageAndOffsetIterable);
+      return new SimpleConsumerMessageBatch(messageAndOffsetIterable);
     } else {
       throw exceptionForKafkaErrorCode(fetchResponse.errorCode(_topic, _partition));
     }

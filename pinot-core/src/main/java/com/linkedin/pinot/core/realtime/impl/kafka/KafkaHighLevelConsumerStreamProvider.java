@@ -41,7 +41,7 @@ public class KafkaHighLevelConsumerStreamProvider implements StreamProvider {
   private ConsumerIterator<byte[], byte[]> kafkaIterator;
   private long lastLogTime = 0;
   private long lastCount = 0;
-  private ConsumerAndIterator consumerAndIterator;
+  private KafkaConsumerAndIterator consumerAndIterator;
 
   private Logger INSTANCE_LOGGER = STATIC_LOGGER;
 

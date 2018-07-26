@@ -1,5 +1,6 @@
 package com.linkedin.pinot.core.realtime.streamV2;
 
+import com.linkedin.pinot.core.realtime.stream.MessageBatch;
 import java.util.concurrent.TimeoutException;
 
 

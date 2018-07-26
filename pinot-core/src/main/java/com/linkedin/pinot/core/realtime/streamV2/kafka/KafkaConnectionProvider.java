@@ -22,10 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-// Alt names: BaseKafkaProvider? KafkaConnectionProvider?
-public class KafkaSimpleStream {
+public class KafkaConnectionProvider {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSimpleStream.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConnectionProvider.class);
   final int MAX_KAFKA_ERROR_COUNT = 10;
   final int MAX_UNKNOWN_TOPIC_REPLY_COUNT = 10;
   final int SLEEP_FOR_MILLIS_ON_ERROR = 100;
@@ -45,6 +44,7 @@ public class KafkaSimpleStream {
 
   State _currentState;
 
+  final String _tableName;
   final String _clientId;
   final String _topic;
   final int _partition;
@@ -59,12 +59,13 @@ public class KafkaSimpleStream {
   private final Random _random = new Random();
   private boolean _metadataOnlyConsumer = false;
 
-  KafkaSimpleStream(StreamConfig streamConfig, String clientId, int partition) {
+  KafkaConnectionProvider(StreamConfig streamConfig, String clientId, int partition, String tableName) {
     _kafkaStreamConfig = new KafkaStreamConfig(streamConfig);
 
+    _tableName = tableName;
     _clientId = clientId;
     _partition = partition;
-    _topic = streamConfig.getName();
+    _topic = streamConfig.getTopicName();
     _connectionTimeoutMillis = streamConfig.getConnectionTimeoutMillis();
     _simpleConsumer = null;
 
@@ -73,8 +74,8 @@ public class KafkaSimpleStream {
     setCurrentState(new ConnectingToBootstrapNode());
   }
 
-  KafkaSimpleStream(StreamConfig streamConfig, String clientId) {
-    this(streamConfig, clientId, Integer.MIN_VALUE);
+  KafkaConnectionProvider(StreamConfig streamConfig, String clientId, String tableName) {
+    this(streamConfig, clientId, Integer.MIN_VALUE, tableName);
     _metadataOnlyConsumer = true;
   }
 

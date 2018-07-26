@@ -147,7 +147,7 @@ public class HLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
 
     _streamConfig = new StreamConfig(tableConfig.getIndexingConfig().getStreamConfigs());
     _segmentLogger = LoggerFactory.getLogger(
-        HLRealtimeSegmentDataManagerV2.class.getName() + "_" + segmentName + "_" + _streamConfig.getName());
+        HLRealtimeSegmentDataManagerV2.class.getName() + "_" + segmentName + "_" + _streamConfig.getTopicName());
     _segmentLogger.info("Created segment data manager with Sorted column:{}, invertedIndexColumns:{}", sortedColumn,
         this.invertedIndexColumns);
 
@@ -161,12 +161,12 @@ public class HLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
     // create and init stream provider
     final String tableName = tableConfig.getTableName();
     StreamConsumerFactory streamConsumerFactory = StreamConsumerFactoryProvider.create(_streamConfig);
-    _highLevelStreamConsumer = streamConsumerFactory.createHighLevelConsumer();
-    _highLevelStreamConsumer.init(tableName, serverMetrics);
+    _highLevelStreamConsumer = streamConsumerFactory.createHighLevelConsumer(tableName);
+    _highLevelStreamConsumer.init(serverMetrics);
 
     _streamMessageDecoder = StreamMessageDecoderFactory.createStreamMessageDecoder(_streamConfig);
-    _streamMessageDecoder.init(_streamConfig.getDecoderProperties(), schema, _streamConfig.getName());
-    _tableStreamName = tableName + "_" + _streamConfig.getName();
+    _streamMessageDecoder.init(_streamConfig.getDecoderProperties(), schema, _streamConfig.getTopicName());
+    _tableStreamName = tableName + "_" + _streamConfig.getTopicName();
 
     IndexingConfig indexingConfig = tableConfig.getIndexingConfig();
     if (indexingConfig != null && indexingConfig.getAggregateMetrics()) {
@@ -177,7 +177,7 @@ public class HLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
     _segmentLogger.info("Started kafka stream provider");
     final int capacity = _streamConfig.getFlushThresholdRows();
     RealtimeSegmentConfig realtimeSegmentConfig = new RealtimeSegmentConfig.Builder().setSegmentName(segmentName)
-        .setStreamName(_streamConfig.getName())
+        .setStreamName(_streamConfig.getTopicName())
         .setSchema(schema)
         .setCapacity(capacity)
         .setAvgNumMultiValues(indexLoadingConfig.getRealtimeAvgMultiValueCount())

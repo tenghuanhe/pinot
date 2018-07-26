@@ -8,10 +8,9 @@ public abstract class StreamConsumerFactory {
     _streamConfig = streamConfig;
   }
 
-  // Add tablename as arg to all, maybe use it for logging
-  public abstract SimpleStreamConsumer createSimpleConsumer(String clientId, int partition);
+  public abstract SimpleStreamConsumer createSimpleConsumer(String clientId, int partition, String tableName);
 
-  public abstract HighLevelStreamConsumer createHighLevelConsumer();
+  public abstract HighLevelStreamConsumer createHighLevelConsumer(String tableName);
 
-  public abstract StreamMetadataProvider createStreamMetadataProvider(String clientId);
+  public abstract StreamMetadataProvider createStreamMetadataProvider(String clientId, String tableName);
 }

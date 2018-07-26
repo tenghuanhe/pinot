@@ -43,7 +43,7 @@ import com.linkedin.pinot.core.indexsegment.mutable.MutableSegmentImpl;
 import com.linkedin.pinot.core.io.readerwriter.PinotDataBufferMemoryManager;
 import com.linkedin.pinot.core.realtime.converter.RealtimeSegmentConverter;
 import com.linkedin.pinot.core.realtime.impl.RealtimeSegmentConfig;
-import com.linkedin.pinot.core.realtime.streamV2.MessageBatch;
+import com.linkedin.pinot.core.realtime.stream.MessageBatch;
 import com.linkedin.pinot.core.realtime.streamV2.SimpleStreamConsumer;
 import com.linkedin.pinot.core.realtime.streamV2.StreamConfig;
 import com.linkedin.pinot.core.realtime.streamV2.StreamConsumerExceptions;
@@ -1000,7 +1000,7 @@ public class LLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
     IndexingConfig indexingConfig = _tableConfig.getIndexingConfig();
     _streamConfig = new StreamConfig(indexingConfig.getStreamConfigs());
     _streamConsumerFactory = StreamConsumerFactoryProvider.create(_streamConfig);
-    _streamTopic = _streamConfig.getName();
+    _streamTopic = _streamConfig.getTopicName();
 
     _segmentNameStr = _segmentZKMetadata.getSegmentName();
     _segmentName = new LLCSegmentName(_segmentNameStr);
@@ -1009,7 +1009,7 @@ public class LLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
     _timeColumnName = tableConfig.getValidationConfig().getTimeColumnName();
     _metricKeyName = _tableName + "-" + _streamTopic + "-" + _streamPartitionId;
     segmentLogger = LoggerFactory.getLogger(LLRealtimeSegmentDataManagerV2.class.getName() + "_" + _segmentNameStr);
-    _tableStreamName = _tableName + "_" + _streamConfig.getName();
+    _tableStreamName = _tableName + "_" + _streamConfig.getTopicName();
     _memoryManager = getMemoryManager(realtimeTableDataManager.getConsumerDir(), _segmentNameStr,
         indexLoadingConfig.isRealtimeOffheapAllocation(), indexLoadingConfig.isDirectRealtimeOffheapAllocation(),
         serverMetrics);
@@ -1147,7 +1147,7 @@ public class LLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
       }
     }
     segmentLogger.info("Creating new stream consumer wrapper, reason: {}", reason);
-    _simpleStreamConsumer = _streamConsumerFactory.createSimpleConsumer(_clientId, _streamPartitionId);
+    _simpleStreamConsumer = _streamConsumerFactory.createSimpleConsumer(_clientId, _streamPartitionId, _tableName);
   }
 
   private void makeMetadataFetcher(String reason) {
@@ -1159,7 +1159,7 @@ public class LLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
       }
     }
     segmentLogger.info("Creating new stream metadata provider, reason: {}", reason);
-    _streamMetadataProvider = _streamConsumerFactory.createStreamMetadataProvider(_clientId);
+    _streamMetadataProvider = _streamConsumerFactory.createStreamMetadataProvider(_clientId, _tableName);
   }
 
   // This should be done during commit? We may not always commit when we build a segment....

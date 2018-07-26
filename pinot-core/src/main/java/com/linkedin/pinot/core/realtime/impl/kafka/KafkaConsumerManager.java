@@ -58,18 +58,18 @@ public class KafkaConsumerManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerManager.class);
   private static final Long IN_USE = -1L;
   private static final long CONSUMER_SHUTDOWN_DELAY_MILLIS = TimeUnit.SECONDS.toMillis(60); // One minute
-  private static final Map<ImmutableTriple<String, String, String>, ConsumerAndIterator>
+  private static final Map<ImmutableTriple<String, String, String>, KafkaConsumerAndIterator>
       CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY = new HashMap<>();
-  private static final IdentityHashMap<ConsumerAndIterator, Long> CONSUMER_RELEASE_TIME = new IdentityHashMap<>();
+  private static final IdentityHashMap<KafkaConsumerAndIterator, Long> CONSUMER_RELEASE_TIME = new IdentityHashMap<>();
 
-  public static ConsumerAndIterator acquireConsumerAndIteratorForConfig(KafkaHighLevelStreamProviderConfig config) {
+  public static KafkaConsumerAndIterator acquireConsumerAndIteratorForConfig(KafkaHighLevelStreamProviderConfig config) {
     final ImmutableTriple<String, String, String> configKey =
         new ImmutableTriple<>(config.getTopicName(), config.getGroupId(), config.getZkString());
 
     synchronized (KafkaConsumerManager.class) {
       // If we have the consumer and it's not already acquired, return it, otherwise error out if it's already acquired
       if (CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.containsKey(configKey)) {
-        ConsumerAndIterator consumerAndIterator = CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.get(configKey);
+        KafkaConsumerAndIterator consumerAndIterator = CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.get(configKey);
         if (CONSUMER_RELEASE_TIME.get(consumerAndIterator).equals(IN_USE)) {
           throw new RuntimeException("Consumer/iterator " + consumerAndIterator.getId() + " already in use!");
         } else {
@@ -89,7 +89,7 @@ public class KafkaConsumerManager {
           get(config.getTopicName()).get(0).iterator();
 
       // Mark both the consumer and iterator as acquired
-      ConsumerAndIterator consumerAndIterator = new ConsumerAndIterator(consumer, iterator);
+      KafkaConsumerAndIterator consumerAndIterator = new KafkaConsumerAndIterator(consumer, iterator);
       CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.put(configKey, consumerAndIterator);
       CONSUMER_RELEASE_TIME.put(consumerAndIterator, IN_USE);
 
@@ -100,7 +100,7 @@ public class KafkaConsumerManager {
     }
   }
 
-  public static void releaseConsumerAndIterator(final ConsumerAndIterator consumerAndIterator) {
+  public static void releaseConsumerAndIterator(final KafkaConsumerAndIterator consumerAndIterator) {
     synchronized (KafkaConsumerManager.class) {
       // Release the consumer, mark it for shutdown in the future
       final long releaseTime = System.currentTimeMillis() + CONSUMER_SHUTDOWN_DELAY_MILLIS;
@@ -121,12 +121,12 @@ public class KafkaConsumerManager {
               LOGGER.info("Executing release check for consumer/iterator {} at {}, scheduled at ", consumerAndIterator.getId(),
                   System.currentTimeMillis(), releaseTime);
 
-              Iterator<Map.Entry<ImmutableTriple<String, String, String>, ConsumerAndIterator>> configIterator =
+              Iterator<Map.Entry<ImmutableTriple<String, String, String>, KafkaConsumerAndIterator>> configIterator =
                   CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.entrySet().iterator();
 
               while (configIterator.hasNext()) {
-                Map.Entry<ImmutableTriple<String, String, String>, ConsumerAndIterator> entry = configIterator.next();
-                ConsumerAndIterator consumerAndIterator = entry.getValue();
+                Map.Entry<ImmutableTriple<String, String, String>, KafkaConsumerAndIterator> entry = configIterator.next();
+                KafkaConsumerAndIterator consumerAndIterator = entry.getValue();
 
                 final Long releaseTime = CONSUMER_RELEASE_TIME.get(consumerAndIterator);
                 if (!releaseTime.equals(IN_USE) && releaseTime < System.currentTimeMillis()) {
@@ -158,10 +158,10 @@ public class KafkaConsumerManager {
       // Shutdown all consumers
       synchronized (KafkaConsumerManager.class) {
         LOGGER.info("Trying to shutdown all the kafka consumers");
-        Iterator<ConsumerAndIterator> consumerIterator = CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.values().iterator();
+        Iterator<KafkaConsumerAndIterator> consumerIterator = CONSUMER_AND_ITERATOR_FOR_CONFIG_KEY.values().iterator();
 
         while (consumerIterator.hasNext()) {
-          ConsumerAndIterator consumerAndIterator = consumerIterator.next();
+          KafkaConsumerAndIterator consumerAndIterator = consumerIterator.next();
           LOGGER.info("Trying to shutdown consumer/iterator {}", consumerAndIterator.getId());
           try {
             consumerAndIterator.getConsumer().shutdown();
