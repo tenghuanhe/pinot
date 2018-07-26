@@ -76,13 +76,14 @@ public class KafkaAvroMessageDecoder implements StreamMessageDecoder<byte[]> {
   private String[] _schemaRegistryUrls;
 
   @Override
-  public void init(Map<String, String> props, Schema indexingSchema, String topicName) throws Exception {
-    _schemaRegistryUrls = parseSchemaRegistryUrls(props.get(SCHEMA_REGISTRY_REST_URL));
+  public void init(Map<String, String> decoderProperties, Schema indexingSchema, String topicName) throws Exception {
+    _schemaRegistryUrls = parseSchemaRegistryUrls(decoderProperties.get(SCHEMA_REGISTRY_REST_URL));
 
     String avroSchemaName = topicName;
-    if (props.containsKey(SCHEMA_REGISTRY_SCHEMA_NAME) && props.get(SCHEMA_REGISTRY_SCHEMA_NAME) != null && !props.get(
+    if (decoderProperties.containsKey(SCHEMA_REGISTRY_SCHEMA_NAME) && decoderProperties.get(SCHEMA_REGISTRY_SCHEMA_NAME) != null && !decoderProperties
+        .get(
         SCHEMA_REGISTRY_SCHEMA_NAME).isEmpty()) {
-      avroSchemaName = props.get(SCHEMA_REGISTRY_SCHEMA_NAME);
+      avroSchemaName = decoderProperties.get(SCHEMA_REGISTRY_SCHEMA_NAME);
     }
     // With the logic below, we may not set defaultAvroSchema to be the latest one everytime.
     // The schema is fetched once when the machine starts. Until the next restart. the latest schema is

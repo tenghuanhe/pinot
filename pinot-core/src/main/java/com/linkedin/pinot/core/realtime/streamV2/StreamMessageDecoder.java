@@ -25,10 +25,10 @@ public interface StreamMessageDecoder<T> extends Closeable {
 
   /**
    *
-   * @param props
+   * @param decoderProperties
    * @throws Exception
    */
-  void init(Map<String, String> props, Schema indexingSchema, String streamName) throws Exception;
+  void init(Map<String, String> decoderProperties, Schema indexingSchema, String topicName) throws Exception;
 
   /**
    *

@@ -4,7 +4,8 @@ import com.linkedin.pinot.common.metrics.ServerMetrics;
 
 
 public interface HighLevelStreamConsumer extends StreamConsumer {
-  void init(StreamConfig streamConfig, String tableName, ServerMetrics serverMetrics) throws Exception;
+  // TODO remove tablename from this
+  void init(String tableName, ServerMetrics serverMetrics) throws Exception;
 
   byte[] fetchNextMessage();
 

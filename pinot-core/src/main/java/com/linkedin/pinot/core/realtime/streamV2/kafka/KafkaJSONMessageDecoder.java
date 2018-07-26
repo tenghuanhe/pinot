@@ -37,7 +37,7 @@ public class KafkaJSONMessageDecoder implements StreamMessageDecoder<byte[]> {
   private Schema schema;
 
   @Override
-  public void init(Map<String, String> props, Schema indexingSchema, String topicName) throws Exception {
+  public void init(Map<String, String> decoderProperties, Schema indexingSchema, String topicName) throws Exception {
     this.schema = indexingSchema;
   }
 

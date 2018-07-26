@@ -26,6 +26,7 @@ public class StreamConfigProperties {
   public static final String STREAM_TYPE = "stream.type";
   public static final String STREAM_FLUSH_THRESHOLD_TIME = "stream.flush.threshold.time";
   public static final String STREAM_FLUSH_THRESHOLD_ROWS = "stream.flush.threshold.rows";
+  public static final String STREAM_FLUSH_SEGMENT_SIZE = "segment.flush.desired.size";
 
   /**
    * Helper method to create a stream specific property

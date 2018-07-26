@@ -162,7 +162,7 @@ public class HLRealtimeSegmentDataManagerV2 extends RealtimeSegmentDataManager {
     final String tableName = tableConfig.getTableName();
     StreamConsumerFactory streamConsumerFactory = StreamConsumerFactoryProvider.create(_streamConfig);
     _highLevelStreamConsumer = streamConsumerFactory.createHighLevelConsumer();
-    _highLevelStreamConsumer.init(_streamConfig, tableName, serverMetrics);
+    _highLevelStreamConsumer.init(tableName, serverMetrics);
 
     _streamMessageDecoder = StreamMessageDecoderFactory.createStreamMessageDecoder(_streamConfig);
     _streamMessageDecoder.init(_streamConfig.getDecoderProperties(), schema, _streamConfig.getName());

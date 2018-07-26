@@ -20,7 +20,7 @@ public class KafkaStreamConsumerFactory extends StreamConsumerFactory {
 
   @Override
   public HighLevelStreamConsumer createHighLevelConsumer() {
-    return new KafkaHighLevelStreamConsumer();
+    return new KafkaHighLevelStreamConsumer(_streamConfig);
   }
 
   @Override

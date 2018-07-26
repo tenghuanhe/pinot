@@ -66,12 +66,17 @@ public class StreamConfig {
     if (flushThresholdTime != null) {
       _flushThresholdTimeMillis = TimeUtils.convertPeriodToMillis(flushThresholdTime);
     }
+    // TODO
+    // Add desired segment size
+    // Look for stream.<name>.decoder.class and set it as a generic property
+    // Look for stream.<name>.consumer.factory.class and set it as a generic property
   }
 
   public String getType() {
     return _type;
   }
 
+  // Rename to getTopicName?
   public String getName() {
     return _name;
   }
@@ -104,6 +109,7 @@ public class StreamConfig {
     return _streamConfigMap.get(key);
   }
 
+  // TODO Remove this method
   public String getStreamSpecificValue(String key) {
     String streamProperty = StreamConfigProperties.constructStreamProperty(_type, key);
     return _streamConfigMap.get(streamProperty);
@@ -119,10 +125,6 @@ public class StreamConfig {
       }
     }
     return streamSpecificProperties;
-  }
-
-  public Map<String, String> getAllProperties() {
-    return _streamConfigMap;
   }
 
   public Map<String, String> getDecoderProperties() {

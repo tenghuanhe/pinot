@@ -39,6 +39,7 @@ public class KafkaStreamConfig {
 
     _kafkaTopicName = streamConfig.getName();
     if (streamConfig.hasHighLevelConsumer()) {
+      // TODO Get map and give it to Kafka and let it figure out all config it needs.
       _zkBrokerUrl = streamConfig.getStreamSpecificValue(KafkaStreamConfigProperties.HLC_ZK_BROKER_URL);
       _groupId = null;
     }

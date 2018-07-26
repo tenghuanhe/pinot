@@ -19,6 +19,7 @@ public class KafkaHighLevelStreamConsumer implements HighLevelStreamConsumer {
   private ConsumerConnector _consumer;
   private ConsumerIterator<byte[], byte[]> _consumerIterator;
   private KafkaConsumerAndIterator _kafkaConsumerAndIterator;
+  private final StreamConfig _streamConfig;
 
   private long _lastLogTime = 0;
   private long _lastCount = 0;
@@ -29,15 +30,19 @@ public class KafkaHighLevelStreamConsumer implements HighLevelStreamConsumer {
   private Meter _tableAndStreamRowsConsumed = null;
   private Meter _tableRowsConsumed = null;
 
+  public KafkaHighLevelStreamConsumer(StreamConfig streamConfig) {
+    _streamConfig = streamConfig;
+  }
+
   @Override
-  public void init(StreamConfig streamConfig, String tableName, ServerMetrics serverMetrics) throws Exception {
-    _tableAndStreamName = tableName + "-" + streamConfig.getName();
+  public void init(String tableName, ServerMetrics serverMetrics) throws Exception {
+    _tableAndStreamName = tableName + "-" + _streamConfig.getName();
     INSTANCE_LOGGER = LoggerFactory.getLogger(
-        KafkaHighLevelStreamConsumer.class.getName() + "_" + tableName + "_" + streamConfig.getName());
+        KafkaHighLevelStreamConsumer.class.getName() + "_" + tableName + "_" + _streamConfig.getName());
     _serverMetrics = serverMetrics;
 
     // TODO: how do we get group id?
-    _kafkaStreamConfig = new KafkaStreamConfig(streamConfig);
+    _kafkaStreamConfig = new KafkaStreamConfig(_streamConfig);
     _kafkaConsumerAndIterator = KafkaConsumerManager.acquireConsumerAndIteratorForConfig(_kafkaStreamConfig);
     _consumerIterator = _kafkaConsumerAndIterator.getIterator();
     _consumer = _kafkaConsumerAndIterator.getConsumer();

@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
  */
 public class StreamConsumerFactoryProvider {
   public static StreamConsumerFactory create(StreamConfig streamConfig) {
+    // TODO make it generic instead of specific
     String factoryClassString = streamConfig.getStreamSpecificValue(StreamConfigProperties.CONSUMER_FACTORY_CLASS);
     StreamConsumerFactory factory = null;
     try {

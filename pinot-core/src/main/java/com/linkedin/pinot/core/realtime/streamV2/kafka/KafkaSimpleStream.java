@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+// Alt names: BaseKafkaProvider? KafkaConnectionProvider?
 public class KafkaSimpleStream {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSimpleStream.class);
